@@ -12,11 +12,30 @@
         };
         (window.onload = func) && (window.onresize = func) && func();
     </script>
+    <script>
+        // 百度统计
+        var _hmt = _hmt || [];
+        (function() {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?64ea79371dfc7c0f0dd4b2516761f02c";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+    </script>
+
+    <script src="https://browser.sentry-cdn.com/4.1.1/bundle.min.js" crossorigin="anonymous"></script>
+    <script>
+        // 错误监控
+        Sentry.init({
+            dsn: 'https://1f6ea3d111604e8ba5a9b3e2adc9676f@sentry.io/1303656'
+        });
+    </script>
 </head>
 
 <body>
     <div id="app"></div>
     <script src="./dist/build.js"></script>
+
 </body>
 
 </html>

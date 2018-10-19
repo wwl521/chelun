@@ -5,6 +5,8 @@ import app from './module/app';
 import detail from './module/detail';
 import inquriy from './module/inquriy';
 import img from './module/img';
+import color from './module/color';
+import type from './module/type';
 
 Vue.use(Vuex);
 export default new Vuex.Store({
@@ -20,6 +22,8 @@ export default new Vuex.Store({
         app,
         detail,
         inquriy,
-        img
+        img,
+        color,
+        type
     }
 });

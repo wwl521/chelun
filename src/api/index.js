@@ -89,8 +89,17 @@ export let getCityList = (provinceId) => {
  * @returns promise
  * 
 */
-export let getImgList = (car_id) => {
-    return getData(`/v2-car-getImageList.html?SerialID=${car_id}`)
+export let getImgList = (obj) => {
+    console.log(obj)
+    let query = '';
+    for(var key in obj){
+        if(obj[key] != ''){
+            query += `&${key}=${obj[key]}`
+        }
+    }
+    query = query.slice(1);
+    console.log(query);
+    return getData(`/v2-car-getImageList.html?${query}`);
 }
 
 /** 

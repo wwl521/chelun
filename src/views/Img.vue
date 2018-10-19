@@ -2,8 +2,8 @@
     <div class="img">
         <!-- 车选型信息 -->
         <ul class="title" v-if="isShow">
-            <li @click="chooseColor"><span>颜色</span></li>
-            <li><span>车款</span></li>
+            <li @click="chooseColor"><span>{{color}}</span></li>
+            <li @click="chooseType"><span>车款</span></li>
         </ul>
         <!-- 图片列表 -->
         <div class="imgList">
@@ -15,8 +15,8 @@
             </div>
         </div>
         <!-- 图片详细列表 -->
-        <div class="picList" v-if="!isShow" @scroll="loadMore">
-            <ul>
+        <div class="picList" v-if="!isShow" @scroll="loadMore($event)">
+            <ul ref="content">
                 <li v-for="(item, index) in picList" :key="index" @click="itemClick">
                     <img :data-src="item.Url.replace('{0}',item.LowSize)" alt="" :data-id="index">
                 </li>
@@ -32,6 +32,10 @@
                 <!-- Optional controls -->
                 <div class="swiper-pagination"  slot="pagination"></div>
             </swiper>
+            <p class="pageCode">
+                <span class="current">{{this.currentIndex}}</span>/
+                <span class="total">{{picList.length}}</span>
+            </p>
         </section>
     </div>    
 </template>
@@ -46,21 +50,39 @@ export default {
     name:'IMG',
     data(){
         return {
-            swiperOption: {
             
-            }
         }
     },
     computed:{
         ...mapState({
             imgList:state=>state.img.imgList,
-            SerialID:state=>state.img.SerialID,
+            SerialID:state=>state.img.query.SerialID,
             ImageID:state=>state.img.ImageID,
             isShow:state=>state.img.isShow,
             picList:state=>state.img.picList,
             page:state=>state.img.page,
-            showSwiper:state=>state.img.showSwiper
+            showSwiper:state=>state.img.showSwiper,
+            isFetch:state=>state.img.isFetch,
+            currentIndex:state=>state.img.currentIndex,
+            total:state=>state.img.total,
+            color:state=>state.img.color,
+            carId:state=>state.img.query.carId,
+            colorId:state=>state.img.quer.colorId
         }),
+        swiperOption(){
+                let that = this;
+            return {
+                on:{
+                    slideChangeTransitionStart:function(){
+                        console.log(this.activeIndex);
+                        that.changeSwiper({
+                            id:this.activeIndex,
+                            showSwiper:true
+                        })
+                    }
+                }
+            }
+        },
         swiper() {
             return this.$refs.mySwiper.swiper
         }
@@ -70,39 +92,52 @@ export default {
         swiperSlide
     },
     methods:{
-        
         ...mapActions({
             getImgList:'img/getImgList',
             showMore:'img/showMore'
         }),
         ...mapMutations({
-            changeSwiper:'img/changeSwiper'
+            changeSwiper:'img/changeSwiper',
+            changeShake:'img/changeShake',
         }),
+        // 选择颜色
         chooseColor(){
             this.$router.push({path:'/color',query:{SerialID:this.SerialID}});
         },
+        // 选择类型
+        chooseType(){
+            this.$router.push({path:'/type',query:{SerialID:this.SerialID}});
+        },
+        // 图片点击
         itemClick(e){
+            // 事件统计
+            _hmt.push(['_trackEvent','汽车报价','tap','品牌点击'])
             let id = e.target.dataset.id;
             this.changeSwiper({
                 id,
                 showSwiper:true
             });
-            
-            // this.swiper.slideTo(id,1000, false);
+            this.swiper.slideTo(id, 1000, false);
         },
+        // swiper点击
         swiperClick(e){
             // console.log('e.target...',e.target)  点击的事件源
             // console.log('e.currentTarget...', e.currentTarget)  绑定的当前事件对象
+            // 点击swiper空白的时候swiper消失
             if(e.target == e.currentTarget){
                 this.changeSwiper({
                     showSwiper:false
                 })
             }
         },
-        loadMore(){
+        loadMore(e){
             // 滚动 加载更多
             //console.log('this.SerialID',this.ImageID);
-            this.showMore(this.ImageID);
+            let pageHeight = this.$refs.content.getBoundingClientRect().height;
+            if(e.target.scrollTop + e.target.clientHeight >= pageHeight -20 && this.isFetch){
+                // 如果 滚动距离+屏幕高度 >= 页面的高度 就进行加载
+                this.showMore(this.ImageID);
+            }
         }
     },
     updated(){
@@ -110,8 +145,10 @@ export default {
         lazyLoad('.picList');
     },
     mounted(){
-        let SerialID = this.$route.query;
+        let SerialID = this.$route.query.SerialID;
         this.getImgList(SerialID);
+
+       
     }
 }
 </script>
@@ -231,6 +268,13 @@ export default {
                    width:100%;
 
                }
+           }
+           .pageCode{
+                position: relative;
+                z-index: 120;
+                right: -46%;
+                top: 48%;
+                color: #fff;
            }
         }
     }

@@ -11,6 +11,7 @@ const Detail = () => import('@/views/Detail');
 const Img = () => import('@/views/Img');
 const Inquriy = () => import('@/views/Inquriy');
 const Color = () => import('@/views/Color');
+const Type = () => import('@/views/Type');
 
 Vue.use(VueRouter);
 let router = new VueRouter({
@@ -35,6 +36,10 @@ let router = new VueRouter({
         name: 'color',
         component: Color
     }, {
+        path: '/type',
+        name: 'type',
+        component: Type
+    },{
         path: '*',
         redirect: '/index'
     }]
